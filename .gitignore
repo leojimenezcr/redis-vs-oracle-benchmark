@@ -1,0 +1,4 @@
+oracle-12c/oracle-data/*
+oracle-12c/oracle-data/.*
+redis/redis-data/*
+redis/redis-data/.*
