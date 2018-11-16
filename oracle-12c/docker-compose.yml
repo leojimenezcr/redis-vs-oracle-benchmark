@@ -1,0 +1,10 @@
+version: "3"
+services:
+  oracle-12c:
+    container_name: oracle12c1
+    image: sath89/oracle-12c
+    ports:
+      - "8081:8080"
+      - "1521:1521"
+    volumes:
+      - "./oracle-data:/u01/app/oracle"
