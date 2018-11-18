@@ -21,17 +21,6 @@ REDISPATH=redis
 
 
 ## FUNCTIONS ##
-function randomize() {
-  echo "randomize" >> $LOGFILE
-  
-  # ignore header
-  #  randomize
-  #  write first N lines
-#  tail -n +2 $SOURCEFILE | \
-#    sort --random-sort | \
-#    head -n $DATASIZE > "${SOURCEFILE%.*}-$DATASIZE-records.csv"
-}
-
 function take_start_time() {
   echo "Taking time for $DATASIZE records..." >> $LOGFILE
   
@@ -88,7 +77,6 @@ function redis_insert() {
 for DATASIZE in ${DATASIZELIST[@]}
 do  
   echo "Starting test with $DATASIZE records" >> $LOGFILE
-  #randomize
 
   # Oracle test
   oracle_start
