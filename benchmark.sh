@@ -87,7 +87,8 @@ function redis_sort() {
 for DATASIZE in ${DATASIZELIST[@]}
 do  
   echo "Starting test with $DATASIZE records." >> $LOGFILE
-  RANDOMLINE=$( shuf -i1-$(( $(wc -l < $SOURCEFILE) - $DATASIZE )) -n1 )
+  # Random number from 1 to (Source file number of lines - Test data size)
+  RANDOMLINE=$( shuf -n1 -i1-$(( $(wc -l < $SOURCEFILE) - $DATASIZE + 1 )) )
   echo $RANDOMLINE
 
   # Oracle test
