@@ -33,11 +33,16 @@ function randomize() {
 }
 
 function take_start_time() {
-  echo "take_start_time" >> $LOGFILE
+  echo "Taking time for $DATASIZE records..." >> $LOGFILE
+  
+  TIME=$(date +%s%3N)
 }
 
-function take_end_time() {
-  echo "take_end_time" >> $LOGFILE
+function take_end_time() {  
+  TIME=$(( $(date +%s%3N) - $TIME ))
+  
+  echo "Processed $DATASIZE records in $(( $TIME / 3600000 )) hours, $(( ($TIME % 3600000) / 60000 )) minutes, $(( ($TIME % 60000) / 1000 )) seconds and $(( ($TIME % 1000) % 1000 )) miliseconds." >> $LOGFILE
+
 }
 
 # Oracle functions
@@ -84,8 +89,6 @@ for DATASIZE in ${DATASIZELIST[@]}
 do  
   echo "Starting test with $DATASIZE records" >> $LOGFILE
   #randomize
-  
-
 
   # Oracle test
   oracle_start
