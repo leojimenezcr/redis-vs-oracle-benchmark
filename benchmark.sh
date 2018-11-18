@@ -52,6 +52,8 @@ function oracle_stop() {
 
 function oracle_insert(){
   echo "oracle_insert" >> $LOGFILE
+  
+  # Example: docker-compose exec oracle-12c sh -c 'echo @/u01/app/oracle/script.sql | sqlplus -s system/oracle'
 }
 
 # Redis functions
