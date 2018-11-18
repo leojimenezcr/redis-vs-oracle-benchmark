@@ -19,6 +19,8 @@ ORACLEPATH=oracle-12c
 
 REDISPATH=redis
 
+RANDOMLINE=0
+
 
 ## FUNCTIONS ##
 function take_start_time() {
@@ -55,6 +57,9 @@ function oracle_insert(){
   
   # Example: docker-compose exec oracle-12c sh -c 'echo @/u01/app/oracle/script.sql | sqlplus -s system/oracle'
 }
+function oracle_sort() {
+  echo "oracle_sort" >> $LOGFILE
+}
 
 # Redis functions
 function redis_start() {
@@ -74,30 +79,32 @@ function redis_stop() {
 function redis_insert() {
   echo "redis_insert" >> $LOGFILE
 }
-
+function redis_sort() {
+  echo "redis_sort" >> $LOGFILE
+}
 
 ## TEST ##
 for DATASIZE in ${DATASIZELIST[@]}
 do  
   echo "Starting test with $DATASIZE records." >> $LOGFILE
+  RANDOMLINE=$( shuf -i1-$(( $(wc -l < $SOURCEFILE) - $DATASIZE )) -n1 )
+  echo $RANDOMLINE
 
   # Oracle test
-  oracle_start
-  
-  take_start_time
+#  oracle_start
   oracle_insert
+  take_start_time
+    oracle_sort
   take_end_time
-  
-  oracle_stop
+#  oracle_stop
 
   # Redis test
-  redis_start
-  
+#  redis_start  
+  redis_insert  
   take_start_time
-  redis_insert
-  take_end_time
-  
-  redis_stop
+    oracle_sort
+  take_end_time  
+#  redis_stop
   
   echo "Ending test for $DATASIZE records." >> $LOGFILE
   echo "" >> $LOGFILE
