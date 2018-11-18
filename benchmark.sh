@@ -30,20 +30,21 @@ function take_start_time() {
 function take_end_time() {  
   TIME=$(( $(date +%s%3N) - $TIME ))
   
-  echo "Processed $DATASIZE records in $(( $TIME / 3600000 )) hours, $(( ($TIME % 3600000) / 60000 )) minutes, $(( ($TIME % 60000) / 1000 )) seconds and $(( ($TIME % 1000) % 1000 )) miliseconds." >> $LOGFILE
+  echo "Processed $DATASIZE records in $TIME miliseconds." >> $LOGFILE
+  echo "Human readable enlapse time: $(( $TIME / 3600000 )) hours, $(( ($TIME % 3600000) / 60000 )) minutes, $(( ($TIME % 60000) / 1000 )) seconds and $(( ($TIME % 1000) % 1000 )) miliseconds." >> $LOGFILE
 
 }
 
 # Oracle functions
 function oracle_start() {
-  echo "Starting Oracle docker" >> $LOGFILE
+  echo "Starting Oracle docker." >> $LOGFILE
   cd $ORACLEPATH
   docker-compose up -d
   sleep 10
 }
 
 function oracle_stop() {
-  echo "Stoping Oracle docker" >> $LOGFILE
+  echo "Stoping Oracle docker." >> $LOGFILE
   docker-compose down
   sleep 10
   cd ..
@@ -55,14 +56,14 @@ function oracle_insert(){
 
 # Redis functions
 function redis_start() {
-  echo "Starting Redis docker" >> $LOGFILE
+  echo "Starting Redis docker." >> $LOGFILE
   cd $REDISPATH
   docker-compose up -d
   sleep 10
 }
 
 function redis_stop() {
-  echo "Stoping Redis docker" >> $LOGFILE
+  echo "Stoping Redis docker." >> $LOGFILE
   docker-compose down
   sleep 10
   cd ..
@@ -76,7 +77,7 @@ function redis_insert() {
 ## TEST ##
 for DATASIZE in ${DATASIZELIST[@]}
 do  
-  echo "Starting test with $DATASIZE records" >> $LOGFILE
+  echo "Starting test with $DATASIZE records." >> $LOGFILE
 
   # Oracle test
   oracle_start
@@ -96,10 +97,10 @@ do
   
   redis_stop
   
-  echo "Ending test for $DATASIZE records" >> $LOGFILE
+  echo "Ending test for $DATASIZE records." >> $LOGFILE
   echo "" >> $LOGFILE
 done
 
-echo "Ending all tests" >> $LOGFILE
+echo "Ending all tests." >> $LOGFILE
 exit 0
 
