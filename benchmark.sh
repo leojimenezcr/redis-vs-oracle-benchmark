@@ -8,6 +8,7 @@
 SOURCEFILE=$(pwd)/testrecords.csv
 DATASIZELIST=(1000 10000)
 #DATASIZELIST=(1000 10000 100000 1000000)
+TESTREPETITIONS=2
 LOGFILE=$(pwd)/benchmark.log
 
 ORACLEHOST=""
@@ -108,33 +109,36 @@ function redis_sort() {
 echo "Logging file: $LOGFILE"
 
 for DATASIZE in ${DATASIZELIST[@]}
-do  
-  echo "Starting test with $DATASIZE records." >> $LOGFILE
-  # Random number from 1 to (Source file number of lines - Test data size + 1)
-  RANDOMLINE=$( shuf -n1 -i1-$(( $(wc -l < $SOURCEFILE) - $DATASIZE + 1 )) )
+do
+  for (( TESTITERACTION=1; TESTITERACTION<=$TESTREPETITIONS; TESTITERACTION++ ))
+  do
+    echo "Starting test $TESTITERACTION of $TESTREPETITIONS with $DATASIZE records." >> $LOGFILE
+    # Random number from 1 to (Source file number of lines - Test data size + 1)
+    RANDOMLINE=$( shuf -n1 -i1-$(( $(wc -l < $SOURCEFILE) - $DATASIZE + 1 )) )
 
-  # Oracle test
-  oracle_start
-  oracle_insert
-  take_start_time
-    oracle_sort
-  take_end_time
-  oracle_clear
-  oracle_stop
+    # Oracle test
+    #oracle_start
+    #oracle_insert
+    take_start_time
+    #  oracle_sort
+    take_end_time
+    #oracle_clear
+    #oracle_stop
 
-  # Redis test
-  #redis_start  
-  #redis_insert  
-  #take_start_time
-  #  redis_sort
-  #take_end_time  
-  #redis_stop
-  
-  echo "Ending test for $DATASIZE records." >> $LOGFILE
-  echo "" >> $LOGFILE
-done
+    # Redis test
+    #redis_start  
+    #redis_insert  
+    take_start_time
+    #  redis_sort
+    take_end_time  
+    #redis_stop
+    
+    echo "Finished test $TESTITERACTION of $TESTREPETITIONS for $DATASIZE records." >> $LOGFILE
+    echo "" >> $LOGFILE
+  done #test repetitions
+done #data size list
 
-echo "Ending all tests." >> $LOGFILE
+echo "Finished all tests." >> $LOGFILE
 echo "" >> $LOGFILE
 exit 0
 
