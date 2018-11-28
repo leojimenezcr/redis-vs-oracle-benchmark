@@ -10,6 +10,7 @@ DATASIZELIST=(1000 10000)
 #DATASIZELIST=(1000 10000 100000 1000000)
 TESTREPETITIONS=2
 LOGFILE=$(pwd)/benchmark.log
+CSVFILE=$(pwd)/$(date +%Y%m%d-%H%M)-benchmark.csv
 
 ORACLEHOST=""
 ORACLEHOSTPORT=1521
@@ -35,12 +36,13 @@ function take_end_time() {
   
   echo "Processed $DATASIZE records in $TIME miliseconds." >> $LOGFILE
   echo "Human readable enlapse time: $(( $TIME / 3600000 )) hours, $(( ($TIME % 3600000) / 60000 )) minutes, $(( ($TIME % 60000) / 1000 )) seconds and $(( ($TIME % 1000) % 1000 )) miliseconds." >> $LOGFILE
-
+  echo "$DATASIZE,$TIME" >> $CSVFILE
 }
 
 # Oracle functions
 function oracle_start() {
   echo "Starting Oracle docker." >> $LOGFILE
+  echo -n "oracle," >> $CSVFILE
   cd $ORACLEPATH
   docker-compose up -d
   sleep 10
@@ -78,6 +80,7 @@ function oracle_sort() {
 # Redis functions
 function redis_start() {
   echo "Starting Redis docker." >> $LOGFILE
+  echo -n "redis," >> $CSVFILE
   cd $REDISPATH
   docker-compose up -d
   sleep 10
@@ -107,6 +110,8 @@ function redis_sort() {
 
 ## TEST ##
 echo "Logging file: $LOGFILE"
+echo "Engine,Data size,Time (ms)" > $CSVFILE
+echo "Results: $CSVFILE"
 
 for DATASIZE in ${DATASIZELIST[@]}
 do
@@ -117,20 +122,20 @@ do
     RANDOMLINE=$( shuf -n1 -i1-$(( $(wc -l < $SOURCEFILE) - $DATASIZE + 1 )) )
 
     # Oracle test
-    #oracle_start
-    #oracle_insert
+    oracle_start
+    oracle_insert
     take_start_time
-    #  oracle_sort
+      oracle_sort
     take_end_time
-    #oracle_clear
-    #oracle_stop
+    oracle_clear
+    oracle_stop
 
     # Redis test
     #redis_start  
     #redis_insert  
-    take_start_time
+    #take_start_time
     #  redis_sort
-    take_end_time  
+    #take_end_time  
     #redis_stop
     
     echo "Finished test $TESTITERACTION of $TESTREPETITIONS for $DATASIZE records." >> $LOGFILE
