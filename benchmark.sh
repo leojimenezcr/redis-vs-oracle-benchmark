@@ -85,6 +85,8 @@ function redis_start() {
 
 function redis_stop() {
   echo "Stoping Redis docker." >> $LOGFILE
+  docker-compose exec redis redis-cli dbsize >> $LOGFILE
+  docker-compose exec redis redis-cli FLUSHDB 
   docker-compose down
   sleep 10
   cd ..
@@ -92,6 +94,11 @@ function redis_stop() {
 
 function redis_insert() {
   echo "Inserting records" >> $LOGFILE
+
+  # SQL script generation
+  tail --lines=+$RANDOMLINE $SOURCEFILE | head -n $DATASIZE | awk -F',' '{ print "HSET " $1$2$3$4$5 " Year " $1 " Month " $2 " DayofMonth " $3 " DayofWeek " $4 " DepTime " $5 " CRSDepTime " $6 " ArrTime " $7 " CRSArrTime " $8 " UniqueCarrier " $9 " FlightNum " $10 " TailNum " $11 " ActualElapsedTime " $12 " CRSElapsedTime " $13 " AirTime " $14 " ArrDelay " $15 " DepDelay " $16 " Origin " $17 " Dest " $18 " Distance " $19 " TaxiIn " $20 " TaxiOut " $21 " Cancelled " $22 "\n"}' > $REDISPATH/redis-data/testscript.txt
+  ## hace falta añadir literalmente un \n al final del string y añadir el lpush 
+  docker-compose exec redis sh -c 'echo $(cat testscript.txt) | redis-cli -c'
 }
 
 function redis_sort() {
@@ -116,12 +123,12 @@ do
   #oracle_stop
 
   # Redis test
-  #redis_start  
+  redis_start  
   redis_insert  
   take_start_time
     redis_sort
   take_end_time  
-  #redis_stop
+  redis_stop
   
   echo "Ending test for $DATASIZE records." >> $LOGFILE
   echo "" >> $LOGFILE
