@@ -6,7 +6,7 @@
 
 ## SETUP ##
 SOURCEFILE=$(pwd)/testrecords.csv
-DATASIZELIST=(1000)
+DATASIZELIST=(1000 10000)
 #DATASIZELIST=(1000 10000 100000 1000000)
 LOGFILE=$(pwd)/benchmark.log
 
@@ -105,10 +105,11 @@ function redis_sort() {
 }
 
 ## TEST ##
+echo "Logging file: $LOGFILE"
+
 for DATASIZE in ${DATASIZELIST[@]}
 do  
   echo "Starting test with $DATASIZE records." >> $LOGFILE
-  echo "Logging file: $LOGFILE"
   # Random number from 1 to (Source file number of lines - Test data size + 1)
   RANDOMLINE=$( shuf -n1 -i1-$(( $(wc -l < $SOURCEFILE) - $DATASIZE + 1 )) )
 
