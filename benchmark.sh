@@ -50,7 +50,6 @@ function oracle_stop() {
   docker-compose down
   sleep 10
   cd ..
-  echo "" >> $LOGFILE
 }
 
 function oracle_insert(){
@@ -114,21 +113,21 @@ do
   RANDOMLINE=$( shuf -n1 -i1-$(( $(wc -l < $SOURCEFILE) - $DATASIZE + 1 )) )
 
   # Oracle test
-  #oracle_start
-  #oracle_insert
-  #take_start_time
-  #  oracle_sort
-  #take_end_time
-  #oracle_clear
-  #oracle_stop
+  oracle_start
+  oracle_insert
+  take_start_time
+    oracle_sort
+  take_end_time
+  oracle_clear
+  oracle_stop
 
   # Redis test
-  redis_start  
-  redis_insert  
-  take_start_time
-    redis_sort
-  take_end_time  
-  redis_stop
+  #redis_start  
+  #redis_insert  
+  #take_start_time
+  #  redis_sort
+  #take_end_time  
+  #redis_stop
   
   echo "Ending test for $DATASIZE records." >> $LOGFILE
   echo "" >> $LOGFILE
