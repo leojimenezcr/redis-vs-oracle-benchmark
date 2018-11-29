@@ -10,7 +10,7 @@ DATASIZELIST=(100 500)
 #DATASIZELIST=(1000 10000 100000 1000000)
 TESTREPETITIONS=2
 LOGFILE=$(pwd)/benchmark.log
-CSVFILE=$(pwd)/$(date +%Y%m%d-%H%M)-benchmark.csv
+CSVFILE=$(pwd)/resultados/$(date +%Y%m%d-%H%M)-benchmark.csv
 
 ORACLEHOST=""
 ORACLEHOSTPORT=1521

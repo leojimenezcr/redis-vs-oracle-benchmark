@@ -3,3 +3,4 @@ redis/redis-data/
 benchmark.log
 testrecords.csv
 *benchmark.csv
+resultados/
