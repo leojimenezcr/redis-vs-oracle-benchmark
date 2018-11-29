@@ -6,9 +6,9 @@
 
 ## SETUP ##
 SOURCEFILE=$(pwd)/testrecords.csv
-DATASIZELIST=(100)
+DATASIZELIST=(100 500)
 #DATASIZELIST=(1000 10000 100000 1000000)
-TESTREPETITIONS=1
+TESTREPETITIONS=2
 LOGFILE=$(pwd)/benchmark.log
 CSVFILE=$(pwd)/$(date +%Y%m%d-%H%M)-benchmark.csv
 
@@ -116,20 +116,20 @@ echo "Results: $CSVFILE"
 
 for DATASIZE in ${DATASIZELIST[@]}
 do
-  #for (( TESTITERACTION=1; TESTITERACTION<=$TESTREPETITIONS; TESTITERACTION++ ))
-  #do
+  for (( TESTITERACTION=1; TESTITERACTION<=$TESTREPETITIONS; TESTITERACTION++ ))
+  do
     echo "Starting test $TESTITERACTION of $TESTREPETITIONS with $DATASIZE records." >> $LOGFILE
     # Random number from 1 to (Source file number of lines - Test data size + 1)
     RANDOMLINE=$( shuf -n1 -i1-$(( $(wc -l < $SOURCEFILE) - $DATASIZE + 1 )) )
 
     # Oracle test
-    #oracle_start
-    #oracle_insert
-    #take_start_time
-    #  oracle_sort
-    #take_end_time
-    #oracle_clear
-    #oracle_stop
+    oracle_start
+    oracle_insert
+    take_start_time
+      oracle_sort
+    take_end_time
+    oracle_clear
+    oracle_stop
 
     # Redis test
     redis_start  
@@ -139,9 +139,9 @@ do
     take_end_time  
     redis_stop
     
-    #echo "Finished test $TESTITERACTION of $TESTREPETITIONS for $DATASIZE records." >> $LOGFILE
+    echo "Finished test $TESTITERACTION of $TESTREPETITIONS for $DATASIZE records." >> $LOGFILE
     echo "" >> $LOGFILE
-  #done #test repetitions
+  done #test repetitions
 done #data size list
 
 echo "Finished all tests." >> $LOGFILE
