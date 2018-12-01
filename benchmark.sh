@@ -6,9 +6,9 @@
 
 ## SETUP ##
 SOURCEFILE=$(pwd)/testrecords.csv
-DATASIZELIST=(100 500)
+DATASIZELIST=(1000)
 #DATASIZELIST=(1000 10000 100000 1000000)
-TESTREPETITIONS=2
+TESTREPETITIONS=1
 LOGFILE=$(pwd)/benchmark.log
 CSVFILE=$(pwd)/resultados/$(date +%Y%m%d-%H%M)-benchmark.csv
 
@@ -28,14 +28,20 @@ RANDOMLINE=0
 function take_start_time() {
   echo "Taking time for $DATASIZE records..." >> $LOGFILE
   
-  TIME=$(date +%s%3N)
+  TIME=$(date +%s%N)
 }
 
 function take_end_time() {  
-  TIME=$(( $(date +%s%3N) - $TIME ))
+  TIME=$(( $(date +%s%N) - $TIME ))
   
-  echo "Processed $DATASIZE records in $TIME miliseconds." >> $LOGFILE
-  echo "Human readable enlapse time: $(( $TIME / 3600000 )) hours, $(( ($TIME % 3600000) / 60000 )) minutes, $(( ($TIME % 60000) / 1000 )) seconds and $(( ($TIME % 1000) % 1000 )) miliseconds." >> $LOGFILE
+  echo "Processed $DATASIZE records in $TIME nanoseconds." >> $LOGFILE
+  echo "Human readable enlapse time: \
+$(( $TIME / 3600000000000 )) hours, \
+$(( ($TIME % 3600000000000) / 60000000000 )) minutes, \
+$(( ($TIME % 60000000000) / 1000000000 )) seconds, \
+$(( ($TIME % 1000000000) / 1000000 )) milliseconds, \
+$(( ($TIME % 1000000) / 1000 )) microseconds and \
+$(( ($TIME % 1000) % 1000 )) nanoseconds" >> $LOGFILE
   echo "$DATASIZE,$TIME" >> $CSVFILE
 }
 
@@ -111,7 +117,7 @@ function redis_sort() {
 
 ## TEST ##
 echo "Logging file: $LOGFILE"
-echo "Engine,Data size,Time (ms)" > $CSVFILE
+echo "Engine,Data size,Time (ns)" > $CSVFILE
 echo "Results: $CSVFILE"
 
 for DATASIZE in ${DATASIZELIST[@]}
