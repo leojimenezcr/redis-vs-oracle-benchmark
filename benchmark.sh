@@ -79,7 +79,7 @@ function oracle_clear(){
 
 function oracle_stop() {
   echo -n "Stoping docker..." >> $LOGFILE
-  docker-compose down
+  docker-compose down 2>&1 > /dev/null
   sleep 10
   cd ..
   echo "OK" >> $LOGFILE
@@ -123,7 +123,7 @@ function redis_clear(){
 
 function redis_stop() {
   echo -n "Stoping docker... " >> $LOGFILE
-  docker-compose down
+  docker-compose down 2>&1 > /dev/null
   sleep 10
   cd ..
   echo "OK" >> $LOGFILE
