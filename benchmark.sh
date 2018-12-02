@@ -162,6 +162,8 @@ do
 
     # Redis test
     redis_start
+    redis_insert_script_generation
+    
     take_start_time
       redis_insert
     take_end_time
