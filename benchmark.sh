@@ -34,8 +34,8 @@ function take_start_time() {
 function take_end_time() {  
   TIME=$(( $(date +%s%N) - $TIME ))
   
-  echo "Enlapse time: $TIME nanoseconds." >> $LOGFILE
-  echo "Enlapse time (human readable): \
+  echo "  Enlapse time: $TIME nanoseconds." >> $LOGFILE
+  echo "  Enlapse time (human readable): \
 $(( $TIME / 3600000000000 )) hours, \
 $(( ($TIME % 3600000000000) / 60000000000 )) minutes, \
 $(( ($TIME % 60000000000) / 1000000000 )) seconds, \
@@ -54,14 +54,6 @@ function oracle_start() {
   echo "OK" >> $LOGFILE
 }
 
-function oracle_stop() {
-  echo -n "Stoping docker..." >> $LOGFILE
-  docker-compose down
-  sleep 10
-  cd ..
-  echo "OK" >> $LOGFILE
-}
-
 function oracle_insert_script_generation(){
   echo -n "Generating insert script... " >> $LOGFILE
   tail --lines=+$RANDOMLINE $SOURCEFILE | head -n $DATASIZE | awk -F',' '{ print "INSERT INTO ontime VALUES(\x27" $1$2$3$4$5 "\x27, \x27" $1 "\x27, \x27" $2 "\x27, \x27" $3 "\x27, \x27" $4 "\x27, \x27" $5 "\x27, \x27" $6 "\x27, \x27" $7 "\x27, \x27" $8 "\x27, \x27" $9 "\x27, \x27" $10 "\x27, \x27" $11 "\x27, \x27" $12 "\x27, \x27" $13 "\x27, \x27" $14 "\x27, \x27" $15 "\x27, \x27" $16 "\x27, \x27" $17 "\x27, \x27" $18 "\x27, \x27" $19 "\x27, \x27" $20 "\x27, \x27" $21 "\x27, \x27" $22 "\x27);" }' > $ORACLEPATH/oracle-data/testscript.sql
@@ -75,6 +67,14 @@ function oracle_insert(){
   echo "OK" >> $LOGFILE
 }
 
+
+function oracle_sort() {
+  echo -n "Sorting records... " >> $LOGFILE  
+  echo -n "oracle,sort," >> $CSVFILE
+  docker-compose exec oracle-12c sh -c 'echo "SELECT id FROM ontime ORDER BY id;" | sqlplus -s system/oracle' &> /dev/null
+  echo "OK" >> $LOGFILE
+}
+
 function oracle_clear(){
   echo -n "Cleaning docker... " >> $LOGFILE
   echo -n "oracle,clear," >> $CSVFILE
@@ -82,11 +82,11 @@ function oracle_clear(){
   echo "OK" >> $LOGFILE
 }
 
-
-function oracle_sort() {
-  echo -n "Sorting records... " >> $LOGFILE  
-  echo -n "oracle,sort," >> $CSVFILE
-  docker-compose exec oracle-12c sh -c 'echo "SELECT id FROM ontime ORDER BY id;" | sqlplus -s system/oracle' &> /dev/null
+function oracle_stop() {
+  echo -n "Stoping docker..." >> $LOGFILE
+  docker-compose down
+  sleep 10
+  cd ..
   echo "OK" >> $LOGFILE
 }
 
@@ -96,21 +96,6 @@ function redis_start() {
   cd $REDISPATH
   docker-compose up -d
   sleep 10
-  echo "OK" >> $LOGFILE
-}
-
-function redis_clear(){
-  echo -n "Cleaning docker... " >> $LOGFILE
-  echo -n "redis,clear," >> $CSVFILE
-  docker-compose exec redis redis-cli FLUSHDB  &> /dev/null
-  echo "OK" >> $LOGFILE
-}
-
-function redis_stop() {
-  echo -n "Stoping docker... " >> $LOGFILE
-  docker-compose down
-  sleep 10
-  cd ..
   echo "OK" >> $LOGFILE
 }
 
@@ -131,6 +116,21 @@ function redis_sort() {
   echo -n "Sorting records... " >> $LOGFILE
   echo -n "redis,sort," >> $CSVFILE
   docker-compose exec redis redis-cli SORT ontime &> /dev/null
+  echo "OK" >> $LOGFILE
+}
+
+function redis_clear(){
+  echo -n "Cleaning docker... " >> $LOGFILE
+  echo -n "redis,clear," >> $CSVFILE
+  docker-compose exec redis redis-cli FLUSHDB  &> /dev/null
+  echo "OK" >> $LOGFILE
+}
+
+function redis_stop() {
+  echo -n "Stoping docker... " >> $LOGFILE
+  docker-compose down
+  sleep 10
+  cd ..
   echo "OK" >> $LOGFILE
 }
 
