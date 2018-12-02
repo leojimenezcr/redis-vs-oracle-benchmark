@@ -11,6 +11,7 @@ TESTREPETITIONS=5
 
 SOURCEFILE=$(pwd)/testrecords.csv
 LOGFILE=$(pwd)/benchmark.log
+ERRLOGFILE=$(pwd)/benchmark-errors.log
 CSVFILE=$(pwd)/resultados/$(date +%Y%m%d-%H%M)-benchmark.csv
 
 ORACLEPATH=$(pwd)/oracle-12c
@@ -107,6 +108,14 @@ function redis_insert() {
   echo "OK" >> $LOGFILE
 }
 
+function redis_insert_validate() {
+  if [ $(docker-compose exec redis redis-cli DBSIZE | awk -F' ' '{print $2}') \< $(( $DATASIZE/100*85 )) ]
+  then
+    echo "Error inserting records" > $ERRLOGFILE
+    exit 1
+  fi
+}
+
 function redis_sort() {
   echo -n "Sorting records... " >> $LOGFILE
   echo -n "redis,sort," >> $CSVFILE
@@ -167,6 +176,8 @@ do
     take_start_time
       redis_insert
     take_end_time
+    
+    redis_insert_validate
 
     take_start_time
       redis_sort
