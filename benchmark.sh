@@ -58,7 +58,7 @@ function oracle_insert_script_generation(){
 function oracle_insert(){
   echo -n "Inserting records... " >> $LOGFILE
   echo -n "oracle,insert," >> $CSVFILE
-  docker-compose exec oracle-12c sh -c 'echo @/u01/app/oracle/testscript.sql | sqlplus -s system/oracle' &> /dev/null
+  docker-compose exec oracle-12c sh -c 'echo @/u01/app/oracle/testscript.sql | sqlplus -s system/oracle' 2>&1 > /dev/null
   echo "OK" >> $LOGFILE
 }
 
@@ -66,14 +66,14 @@ function oracle_insert(){
 function oracle_sort() {
   echo -n "Sorting records... " >> $LOGFILE  
   echo -n "oracle,sort," >> $CSVFILE
-  docker-compose exec oracle-12c sh -c 'echo "SELECT id FROM ontime ORDER BY id;" | sqlplus -s system/oracle' &> /dev/null
+  docker-compose exec oracle-12c sh -c 'echo "SELECT id FROM ontime ORDER BY id;" | sqlplus -s system/oracle' 2>&1 > /dev/null
   echo "OK" >> $LOGFILE
 }
 
 function oracle_clear(){
   echo -n "Cleaning docker... " >> $LOGFILE
   echo -n "oracle,clear," >> $CSVFILE
-  docker-compose exec oracle-12c sh -c 'echo "DELETE FROM ontime;" | sqlplus -s system/oracle' &> /dev/null
+  docker-compose exec oracle-12c sh -c 'echo "DELETE FROM ontime;" | sqlplus -s system/oracle' 2>&1 > /dev/null
   echo "OK" >> $LOGFILE
 }
 
@@ -103,21 +103,21 @@ function redis_insert_script_generation(){
 function redis_insert() {
   echo -n "Inserting records... " >> $LOGFILE
   echo -n "redis,insert," >> $CSVFILE
-  docker-compose exec redis sh -c 'echo $(cat testscript.txt) | redis-cli -c' &> /dev/null
+  docker-compose exec redis sh -c 'echo $(cat testscript.txt) | redis-cli -c' 2>&1 > /dev/null
   echo "OK" >> $LOGFILE
 }
 
 function redis_sort() {
   echo -n "Sorting records... " >> $LOGFILE
   echo -n "redis,sort," >> $CSVFILE
-  docker-compose exec redis redis-cli SORT ontime &> /dev/null
+  docker-compose exec redis redis-cli SORT ontime 2>&1 > /dev/null
   echo "OK" >> $LOGFILE
 }
 
 function redis_clear(){
   echo -n "Cleaning docker... " >> $LOGFILE
   echo -n "redis,clear," >> $CSVFILE
-  docker-compose exec redis redis-cli FLUSHDB  &> /dev/null
+  docker-compose exec redis redis-cli FLUSHDB  2>&1 > /dev/null
   echo "OK" >> $LOGFILE
 }
 
