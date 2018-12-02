@@ -5,9 +5,9 @@
 # Prerandomized data file
 
 ## SETUP ##
-#DATASIZELIST=(1000 100000)
-DATASIZELIST=(1000 10000 100000 1000000 100000000)
-TESTREPETITIONS=5
+DATASIZELIST=(1000)
+#DATASIZELIST=(1000 10000 100000 1000000 100000000)
+TESTREPETITIONS=1
 
 SOURCEFILE=$(pwd)/testrecords.csv
 LOGFILE=$(pwd)/benchmark.log
@@ -63,6 +63,13 @@ function oracle_insert(){
   echo "OK" >> $LOGFILE
 }
 
+function oracle_insert_validate() {
+  if [ $(docker-compose exec oracle-12c sh -c 'echo "SELECT COUNT(ID) FROM ontime;" | sqlplus -s system/oracle' | tail -n 2 | head -n 1 | awk -F' ' '{print $1}') \< $(( $DATASIZE/100*85 )) ]
+  then
+    echo "Error inserting records" > $ERRLOGFILE
+    exit 1
+  fi
+}
 
 function oracle_sort() {
   echo -n "Sorting records... " >> $LOGFILE  
@@ -158,6 +165,8 @@ do
     take_start_time
       oracle_insert
     take_end_time
+    
+    oracle_insert_validate
     
     take_start_time
       oracle_sort
