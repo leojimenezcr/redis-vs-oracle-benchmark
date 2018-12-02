@@ -1,6 +1,7 @@
 oracle-12c/oracle-data/
 redis/redis-data/
 benchmark.log
+benchmark-errors.log
 testrecords.csv
 *benchmark.csv
 resultados/
