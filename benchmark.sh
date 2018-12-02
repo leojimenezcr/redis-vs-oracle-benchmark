@@ -48,7 +48,6 @@ $(( ($TIME % 1000) % 1000 )) nanoseconds" >> $LOGFILE
 # Oracle functions
 function oracle_start() {
   echo -n "Starting Oracle docker..." >> $LOGFILE
-  echo -n "oracle," >> $CSVFILE
   cd $ORACLEPATH
   docker-compose up -d
   sleep 10
@@ -71,12 +70,14 @@ function oracle_insert_script_generation(){
 
 function oracle_insert(){
   echo -n "Inserting records... " >> $LOGFILE
+  echo -n "oracle,insert," >> $CSVFILE
   docker-compose exec oracle-12c sh -c 'echo @/u01/app/oracle/testscript.sql | sqlplus -s system/oracle' &> /dev/null
   echo "OK" >> $LOGFILE
 }
 
 function oracle_clear(){
-  echo -n "Cleaning docker... " >> $LOGFILE  
+  echo -n "Cleaning docker... " >> $LOGFILE
+  echo -n "oracle,clear," >> $CSVFILE
   docker-compose exec oracle-12c sh -c 'echo "DELETE FROM ontime;" | sqlplus -s system/oracle' &> /dev/null
   echo "OK" >> $LOGFILE
 }
@@ -84,6 +85,7 @@ function oracle_clear(){
 
 function oracle_sort() {
   echo -n "Sorting records... " >> $LOGFILE  
+  echo -n "oracle,sort," >> $CSVFILE
   docker-compose exec oracle-12c sh -c 'echo "SELECT id FROM ontime ORDER BY id;" | sqlplus -s system/oracle' &> /dev/null
   echo "OK" >> $LOGFILE
 }
@@ -91,16 +93,21 @@ function oracle_sort() {
 # Redis functions
 function redis_start() {
   echo -n "Starting Redis docker... " >> $LOGFILE
-  echo -n "redis," >> $CSVFILE
   cd $REDISPATH
   docker-compose up -d
   sleep 10
   echo "OK" >> $LOGFILE
 }
 
+function redis_clear(){
+  echo -n "Cleaning docker... " >> $LOGFILE
+  echo -n "redis,clear," >> $CSVFILE
+  docker-compose exec redis redis-cli FLUSHDB  &> /dev/null
+  echo "OK" >> $LOGFILE
+}
+
 function redis_stop() {
   echo -n "Stoping docker... " >> $LOGFILE
-  docker-compose exec redis redis-cli FLUSHDB  &> /dev/null
   docker-compose down
   sleep 10
   cd ..
@@ -115,19 +122,21 @@ function redis_insert_script_generation(){
 
 function redis_insert() {
   echo -n "Inserting records... " >> $LOGFILE
+  echo -n "redis,insert," >> $CSVFILE
   docker-compose exec redis sh -c 'echo $(cat testscript.txt) | redis-cli -c' &> /dev/null
   echo "OK" >> $LOGFILE
 }
 
 function redis_sort() {
   echo -n "Sorting records... " >> $LOGFILE
+  echo -n "redis,sort," >> $CSVFILE
   docker-compose exec redis redis-cli SORT ontime &> /dev/null
   echo "OK" >> $LOGFILE
 }
 
 ## TEST ##
 echo "Logging file: $LOGFILE"
-echo "Engine,Data size,Time (ns)" > $CSVFILE
+echo "Engine,Action,Data size,Time (ns)" > $CSVFILE
 echo "Results: $CSVFILE"
 
 for DATASIZE in ${DATASIZELIST[@]}
@@ -164,6 +173,10 @@ do
 
     take_start_time
       redis_sort
+    take_end_time
+
+    take_start_time
+      redis_clear
     take_end_time
 
     redis_stop
