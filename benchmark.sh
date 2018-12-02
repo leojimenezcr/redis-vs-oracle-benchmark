@@ -5,20 +5,15 @@
 # Prerandomized data file
 
 ## SETUP ##
-SOURCEFILE=$(pwd)/testrecords.csv
 DATASIZELIST=(1000)
 #DATASIZELIST=(1000 10000 100000 1000000)
 TESTREPETITIONS=1
+
+SOURCEFILE=$(pwd)/testrecords.csv
 LOGFILE=$(pwd)/benchmark.log
 CSVFILE=$(pwd)/resultados/$(date +%Y%m%d-%H%M)-benchmark.csv
 
-ORACLEHOST=""
-ORACLEHOSTPORT=1521
-ORACLEDB=""
-ORACLEUSER=system
-ORACLEPASS=oracle
 ORACLEPATH=$(pwd)/oracle-12c
-
 REDISPATH=$(pwd)/redis
 
 RANDOMLINE=0
