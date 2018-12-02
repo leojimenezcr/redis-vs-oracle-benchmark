@@ -44,7 +44,7 @@ $(( ($TIME % 1000) % 1000 )) nanoseconds" >> $LOGFILE
 function oracle_start() {
   echo -n "Starting Oracle docker..." >> $LOGFILE
   cd $ORACLEPATH
-  docker-compose up -d
+  docker-compose up -d 2>&1 > /dev/null
   sleep 40
   echo "OK" >> $LOGFILE
 }
@@ -89,7 +89,7 @@ function oracle_stop() {
 function redis_start() {
   echo -n "Starting Redis docker... " >> $LOGFILE
   cd $REDISPATH
-  docker-compose up -d
+  docker-compose up -d 2>&1 > /dev/null
   sleep 10
   echo "OK" >> $LOGFILE
 }
