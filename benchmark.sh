@@ -45,7 +45,7 @@ function oracle_start() {
   echo -n "Starting Oracle docker..." >> $LOGFILE
   cd $ORACLEPATH
   docker-compose up -d
-  sleep 10
+  sleep 40
   echo "OK" >> $LOGFILE
 }
 
