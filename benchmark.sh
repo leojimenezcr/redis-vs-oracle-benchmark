@@ -191,7 +191,6 @@ do
     oracle_stop
 
     # Redis test
-    comment='''redis_start
     redis_insert_script_generation
     
     take_start_time
@@ -208,7 +207,7 @@ do
       redis_clear
     take_end_time
 
-    redis_stop'''
+    redis_stop
     
     echo "Finished test $TESTITERACTION of $TESTREPETITIONS for $DATASIZE records." >> $LOGFILE
     echo "" >> $LOGFILE
