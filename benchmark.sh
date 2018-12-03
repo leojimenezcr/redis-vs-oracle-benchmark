@@ -101,11 +101,17 @@ function oracle_stop() {
 
 # Redis functions
 function redis_start() {
-  echo -n "Starting Redis docker... " >> $LOGFILE
+  echo -n "Starting Redis docker" >> $LOGFILE
   cd $REDISPATH
   docker-compose up -d 2>&1 > /dev/null
-  sleep 10
-  echo "OK" >> $LOGFILE
+
+  while ! docker-compose logs --tail=1 | grep -q "Ready to accept connections"
+  do
+    sleep 1
+    echo -n "." >> $LOGFILE
+  done
+  
+  echo " OK" >> $LOGFILE
 }
 
 function redis_insert_script_generation(){
