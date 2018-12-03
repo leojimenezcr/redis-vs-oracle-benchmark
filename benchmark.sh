@@ -47,11 +47,12 @@ function oracle_start() {
   cd $ORACLEPATH
   docker-compose up -d 2>&1 > /dev/null
 
-  while [ echo $(docker-compose exec oracle-12c sh -c 'echo "SELECT INSTANCE_NAME FROM V\$INSTANCE;" | sqlplus -s system/oracle' | grep "xe") != "xe" ]
+  while ! docker-compose logs --tail=1 | grep -q "Database ready"
   do
     sleep 1
     echo -n "." >> $LOGFILE
   done
+  
   echo " OK" >> $LOGFILE
 }
 
