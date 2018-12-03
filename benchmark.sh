@@ -52,7 +52,7 @@ function oracle_start() {
     sleep 1
     echo -n "." >> $LOGFILE
   done
-  echo "OK" >> $LOGFILE
+  echo " OK" >> $LOGFILE
 }
 
 function oracle_insert_script_generation(){
