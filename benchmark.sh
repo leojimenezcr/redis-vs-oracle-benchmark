@@ -43,10 +43,18 @@ $(( ($TIME % 1000) % 1000 )) nanoseconds" >> $LOGFILE
 
 # Oracle functions
 function oracle_start() {
-  echo -n "Starting Oracle docker..." >> $LOGFILE
+  echo -n "Starting Oracle docker" >> $LOGFILE
   cd $ORACLEPATH
   docker-compose up -d 2>&1 > /dev/null
-  sleep 40
+
+  while [ $(docker-compose exec oracle-12c sh -c 'echo "SELECT INSTANCE_NAME FROM V\$INSTANCE;" | sqlplus -s system/oracle' | grep xe) != "xe" ]
+  do
+    docker-compose exec oracle-12c sh -c 'echo "SELECT INSTANCE_NAME FROM V\$INSTANCE;" | sqlplus -s system/oracle' | grep xe
+    echo $?
+    sleep 1
+    echo -n "." >> $LOGFILE
+  done
+
   echo "OK" >> $LOGFILE
 }
 
@@ -179,7 +187,7 @@ do
     oracle_stop
 
     # Redis test
-    redis_start
+    comment='''redis_start
     redis_insert_script_generation
     
     take_start_time
@@ -196,7 +204,7 @@ do
       redis_clear
     take_end_time
 
-    redis_stop
+    redis_stop'''
     
     echo "Finished test $TESTITERACTION of $TESTREPETITIONS for $DATASIZE records." >> $LOGFILE
     echo "" >> $LOGFILE
