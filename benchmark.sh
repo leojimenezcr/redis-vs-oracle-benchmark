@@ -47,7 +47,7 @@ function oracle_start() {
   cd $ORACLEPATH
   docker-compose up -d 2>&1 > /dev/null
 
-  while ! docker-compose logs --tail=1 | grep -q "Database ready"
+  while ! docker-compose logs | grep -q "Database ready"
   do
     sleep 1
     echo -n "." >> $LOGFILE
@@ -70,7 +70,7 @@ function oracle_insert(){
 }
 
 function oracle_insert_validate() {
-  echo "Inserted $(docker-compose exec oracle-12c sh -c 'echo "SELECT COUNT(ID) FROM ontime;" | sqlplus -s system/oracle' | tail -n 2 | head -n 1 | awk -F' ' '{print $1}') redords" >> $LOGFILE
+  echo -n "Inserted $(docker-compose exec oracle-12c sh -c 'echo "SELECT COUNT(ID) FROM ontime;" | sqlplus -s system/oracle' | tail -n 2 | head -n 1 | awk -F' ' '{print $1}') records" >> $LOGFILE
   if [ $(docker-compose exec oracle-12c sh -c 'echo "SELECT COUNT(ID) FROM ontime;" | sqlplus -s system/oracle' | tail -n 2 | head -n 1 | awk -F' ' '{print $1}') \< $(( $DATASIZE/100*85 )) ]
   then
     echo " ERROR!" >> $LOGFILE
@@ -109,7 +109,7 @@ function redis_start() {
   cd $REDISPATH
   docker-compose up -d 2>&1 > /dev/null
 
-  while ! docker-compose logs --tail=1 | grep -q "Ready to accept connections"
+  while ! docker-compose logs | grep -q "Ready to accept connections"
   do
     sleep 1
     echo -n "." >> $LOGFILE
