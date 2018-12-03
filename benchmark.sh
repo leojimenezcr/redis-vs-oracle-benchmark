@@ -70,15 +70,15 @@ function oracle_insert(){
 }
 
 function oracle_insert_validate() {
-  echo -n "Inserted $(docker-compose exec oracle-12c sh -c 'echo "SELECT COUNT(ID) FROM ontime;" | sqlplus -s system/oracle' | tail -n 2 | head -n 1 | awk -F' ' '{print $1}') records" >> $LOGFILE
-  if [ $(docker-compose exec oracle-12c sh -c 'echo "SELECT COUNT(ID) FROM ontime;" | sqlplus -s system/oracle' | tail -n 2 | head -n 1 | awk -F' ' '{print $1}') \< $(( $DATASIZE/100*85 )) ]
+  echo -n "Inserted $(docker-compose exec oracle-12c sh -c 'echo "SELECT COUNT(ID) FROM ontime;" | sqlplus -s system/oracle' | tr -dc '[:digit:]') records" >> $LOGFILE
+  if [ $(docker-compose exec oracle-12c sh -c 'echo "SELECT COUNT(ID) FROM ontime;" | sqlplus -s system/oracle' | tr -dc '[:digit:]') \< $(( $DATASIZE/100*85 )) ]
   then
     echo " ERROR!" >> $LOGFILE
     echo "Error inserting records" >> $ERRLOGFILE
     exit 1
   fi
   
-  echo " OK" >> $LOGFILE
+  echo " ACCEPTED" >> $LOGFILE
 }
 
 function oracle_sort() {
@@ -132,15 +132,15 @@ function redis_insert() {
 }
 
 function redis_insert_validate() {
-  echo "Inserted $(docker-compose exec redis redis-cli DBSIZE | awk -F' ' '{print $2}') redords" >> $LOGFILE
-  if [ $(docker-compose exec redis redis-cli DBSIZE | awk -F' ' '{print $2}') \< $(( $DATASIZE/100*85 )) ]
+  echo -n "Inserted $(docker-compose exec redis redis-cli DBSIZE | tr -dc '[:digit:]') records" >> $LOGFILE
+  if [ $(docker-compose exec redis redis-cli DBSIZE | tr -dc '[:digit:]') \< $(( $DATASIZE/100*85 )) ]
   then
     echo " ERROR!" >> $LOGFILE
     echo "Error inserting records" >> $ERRLOGFILE
     exit 1
   fi
   
-  echo " OK" >> $LOGFILE
+  echo " ACCEPTED" >> $LOGFILE
 }
 
 function redis_sort() {
