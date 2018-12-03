@@ -74,6 +74,7 @@ function oracle_insert_validate() {
   if [ $(docker-compose exec oracle-12c sh -c 'echo "SELECT COUNT(ID) FROM ontime;" | sqlplus -s system/oracle' | tr -dc '[:digit:]') \< $(( $DATASIZE/100*85 )) ]
   then
     echo " ERROR!" >> $LOGFILE
+    echo "" >> $LOGFILE
     echo "Error inserting records" >> $ERRLOGFILE
     exit 1
   fi
@@ -136,6 +137,7 @@ function redis_insert_validate() {
   if [ $(docker-compose exec redis redis-cli DBSIZE | tr -dc '[:digit:]') \< $(( $DATASIZE/100*85 )) ]
   then
     echo " ERROR!" >> $LOGFILE
+    echo "" >> $LOGFILE
     echo "Error inserting records" >> $ERRLOGFILE
     exit 1
   fi
