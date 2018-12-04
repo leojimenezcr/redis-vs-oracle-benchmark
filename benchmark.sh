@@ -5,9 +5,9 @@
 # Prerandomized data file
 
 ## SETUP ##
-DATASIZELIST=(1000)
-#DATASIZELIST=(1000 10000 100000 1000000 100000000)
-TESTREPETITIONS=1
+#DATASIZELIST=(1000)
+DATASIZELIST=(1000 5000 10000 50000 100000 500000 1000000)
+TESTREPETITIONS=10
 
 SOURCEFILE=$(pwd)/testrecords.csv
 LOGFILE=$(pwd)/benchmark.log
@@ -71,7 +71,7 @@ function oracle_insert(){
 
 function oracle_insert_validate() {
   echo -n "Inserted $(docker-compose exec oracle-12c sh -c 'echo "SELECT COUNT(ID) FROM ontime;" | sqlplus -s system/oracle' | tr -dc '[:digit:]') records" >> $LOGFILE
-  if [ $(docker-compose exec oracle-12c sh -c 'echo "SELECT COUNT(ID) FROM ontime;" | sqlplus -s system/oracle' | tr -dc '[:digit:]') \< $(( $DATASIZE/100*85 )) ]
+  if [ $(docker-compose exec oracle-12c sh -c 'echo "SELECT COUNT(ID) FROM ontime;" | sqlplus -s system/oracle' | tr -dc '[:digit:]') -lt $(( $DATASIZE/100*85 )) ]
   then
     echo " ERROR!" >> $LOGFILE
     echo "" >> $LOGFILE
@@ -121,7 +121,7 @@ function redis_start() {
 
 function redis_insert_script_generation(){
   echo -n "Generating insert script... " >> $LOGFILE
-  tail --lines=+$RANDOMLINE $SOURCEFILE | head -n $DATASIZE | awk -F',' '{ print "HSET " $1$2$3$4$5 " Year " $1 " Month " $2 " DayofMonth " $3 " DayofWeek " $4 " DepTime " $5 " CRSDepTime " $6 " ArrTime " $7 " CRSArrTime " $8 " UniqueCarrier " $9 " FlightNum " $10 " TailNum " $11 " ActualElapsedTime " $12 " CRSElapsedTime " $13 " AirTime " $14 " ArrDelay " $15 " DepDelay " $16 " Origin " $17 " Dest " $18 " Distance " $19 " TaxiIn " $20 " TaxiOut " $21 " Cancelled " $22 " \\n \nLPUSH ontime " $1$2$3$4$5 " \\n"}' > $REDISPATH/redis-data/testscript.txt
+  tail --lines=+$RANDOMLINE $SOURCEFILE | head -n $DATASIZE | awk -F',' '{ print "HSET \x27" $1$2$3$4$5 "\x27 Year \x27" $1 "\x27 Month \x27" $2 "\x27 DayofMonth \x27" $3 "\x27 DayofWeek \x27" $4 "\x27 DepTime \x27" $5 "\x27 CRSDepTime \x27" $6 "\x27 ArrTime \x27" $7 "\x27 CRSArrTime \x27" $8 "\x27 UniqueCarrier \x27" $9 "\x27 FlightNum \x27" $10 "\x27 TailNum \x27" $11 "\x27 ActualElapsedTime \x27" $12 "\x27 CRSElapsedTime \x27" $13 "\x27 AirTime \x27" $14 "\x27 ArrDelay \x27" $15 "\x27 DepDelay \x27" $16 "\x27 Origin \x27" $17 "\x27 Dest \x27" $18 "\x27 Distance \x27" $19 "\x27 TaxiIn \x27" $20 "\x27 TaxiOut \x27" $21 "\x27 Cancelled \x27" $22 "\x27 \\n \nLPUSH ontime \x27" $1$2$3$4$5 "\x27 \\n"}' > $REDISPATH/redis-data/testscript.txt
   echo "OK" >> $LOGFILE
 }
 
@@ -134,7 +134,7 @@ function redis_insert() {
 
 function redis_insert_validate() {
   echo -n "Inserted $(docker-compose exec redis redis-cli DBSIZE | tr -dc '[:digit:]') records" >> $LOGFILE
-  if [ $(docker-compose exec redis redis-cli DBSIZE | tr -dc '[:digit:]') \< $(( $DATASIZE/100*85 )) ]
+  if [ $(docker-compose exec redis redis-cli DBSIZE | tr -dc '[:digit:]') -lt $(( $DATASIZE/100*85 )) ]
   then
     echo " ERROR!" >> $LOGFILE
     echo "" >> $LOGFILE
